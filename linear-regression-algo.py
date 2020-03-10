@@ -7,7 +7,7 @@ def split_train_test(dataset, test_size=0.25):
     X = dataset.iloc[:, :-1].values
     y = dataset.iloc[:, 1].values
     dataset_size = dataset.shape[0]
-    split_index = int(round((dataset_size / 10)*(test_size*10))) 
+    split_index = int(round(dataset_size * test_size)) 
     return X[split_index:], y[split_index:], X[:split_index], y[:split_index]  
 
     
