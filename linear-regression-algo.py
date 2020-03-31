@@ -16,12 +16,9 @@ def matrix_regressor(x, y):
     for i in x:
         X_t.extend(i)
     X = np.vstack((X_t, np.ones(len(X_t))))
-    # print(x, X)
     Y = []
     for i in y:
         Y.append([i])
-    # print(y, Y)
-#    print(X, Y)
     A = np.linalg.inv(X @ X.T) @ X @ Y
     return A
 
@@ -37,31 +34,28 @@ def mean_sqaure_error(m, c, X_train, y_train):
 def gradient_descent(m, c, learning_rate, X, y):
     m_gradient = 0
     c_gradient = 0
-    convergance = False
+    convergence = False
     n = len(X)
     for i in range(n):
         m_gradient += - (2/n) * X[i] * (y[i] - ((m * X[i]) + c))
         c_gradient += - (2/n) * (y[i] - ((m * X[i]) + c))
     
-    if (-500 < m_gradient < 500) and ( -500< c_gradient < 500):
-        print("Grad", m_gradient, c_gradient)
-        convergance = True
-    else:
-        learning_rate = 0.001
+    if (np.around(np.linalg.norm(m_gradient), 2) == 0.000) and (np.around(np.linalg.norm(c_gradient), 2) == 0.000):
+        print(f"Gradient with respect to m is {m_gradient[0]} and with respect to c is {c_gradient[0]} \n")
+        convergence = True
         
     new_m = m - (m_gradient * learning_rate)
     new_c = c - (c_gradient * learning_rate)
-    return new_m, new_c, convergance
+    return new_m, new_c, convergence
 
 
 def build_model(initial_m, initial_c, learning_rate, X, y, num_iterations):
     m = initial_m
     c = initial_c
-    convergance = False
-#    for _ in range(num_iterations):
-#        m,c = gradient_descent(m, c, learning_rate, X, y)
-    while not convergance:
-        m,c, convergance = gradient_descent(m, c, learning_rate, X, y)
+    convergence = False
+    
+    while not convergence:
+        m,c, convergence = gradient_descent(m, c, learning_rate, X, y)
     return [m,c]
 
 
@@ -76,27 +70,28 @@ if __name__ == "__main__":
     
     X_train, y_train, X_test, y_test = split_train_test(dataset, 0.2)
     
-    learning_rate = 0.0001
+    learning_rate = 0.01
     initial_m = 0
     initial_c = 0
     num_iterations = 1000
     
     model = [m,c] = build_model(initial_m, initial_c, learning_rate, X_train, y_train, num_iterations)
-    print(mean_sqaure_error(initial_m, initial_c, X_train, y_train))
-    print(mean_sqaure_error(model[0], model[1], X_train, y_train))
-    
-    for i in range(len(X_test)):        
-        print(f"Predicted values is {predict(model, X_test[i])}, actual value is {y_test[i]}")
-        
+            
     mat_reg = matrix_regressor(X_train, y_train)
     
+    print(f"Model based on gradient descent is {model}")
+    print(f"Model based on mathematical formula is {mat_reg} \n")
+
+    print(f"Mean square error for m={initial_m} and c={initial_c} is {mean_sqaure_error(initial_m, initial_c, X_train, y_train)[0]}")
+    print(f"Mean square error for m={model[0][0]} and c={model[1][0]} is {mean_sqaure_error(model[0], model[1], X_train, y_train)[0]} \n")
+  
+    for i in range(len(X_test)):        
+        print(f"Predicted value for x={i} is {predict(model, X_test[i])[0]} where actual value is {y_test[i]}")
+
     y_pred = []
     for i in range(len(X_train)):        
         y_pred.append(predict(model, X_train[i]))
 
-    print(model)
-    print(mat_reg)
-        
     # Visualising the Training set results
     plt.scatter(X_train, y_train, color = 'red')
     plt.plot(X_train, y_pred, color = 'blue')
