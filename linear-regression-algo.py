@@ -11,15 +11,9 @@ def split_train_test(dataset, test_size=0.25):
     return X[split_index:], y[split_index:], X[:split_index], y[:split_index]  
 
 
-def matrix_regressor(x, y):
-    X_t = []
-    for i in x:
-        X_t.extend(i)
-    X = np.vstack((X_t, np.ones(len(X_t))))
-    Y = []
-    for i in y:
-        Y.append([i])
-    A = np.linalg.inv(X @ X.T) @ X @ Y
+def matrix_regressor(X, y):
+    X = np.vstack((X.T, np.ones(len(X))))
+    A = np.linalg.inv(X @ X.T) @ X @ y
     return A
 
     
